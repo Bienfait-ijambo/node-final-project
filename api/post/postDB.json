@@ -1,0 +1,21 @@
+{
+  "data": [
+    {
+      "postId": 4,
+      "title": "The Impact of Machine Learning on Business",
+      "content": "Machine learning algorithms are being used to analyze large datasets, optimize processes, and drive business growth through predictive analytics and automation."
+    },
+    {
+      "postId": 7,
+      "title": "What is TypeScript",
+      "content": "It is statically typed language"
+    },
+    {
+      "postId": 8,
+      "title": "What is BootStrap",
+      "content": "Bootstrap is a css framework"
+    },
+    { "postId": 5, "title": "What is Docket", "content": "content...." },
+    { "postId": 6, "title": "What is Ts", "content": "Ts is...." }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "data": [
+    {
+      "id": 1,
+      "name": "Chris",
+      "email": "chris@gmail.com",
+      "password": "49e092ae63500405ea675102a92d7464d02c6e72f012469643b422db6e3c40cd",
+      "salt": "4971337a1949ffc93c58897e360ed330"
+    }
+  ]
+}
