@@ -10,6 +10,8 @@ function accessPostDBData() {
   return {data,postDBPath};
 }
 
+
+
 postRoutes.post("/posts", function (req, res) {
   const {data,postDBPath} = accessPostDBData();
 
