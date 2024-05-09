@@ -11,7 +11,6 @@ Steps to run this project:
 
 
 
-
 # Api documentation
 
 ## PUBLIC ENDPOINTS
@@ -34,7 +33,6 @@ Request body
 	{
 	  "name": "string",
 	  "email": "string",
-	  "password": "string"
 	}
 ```
 
@@ -45,7 +43,6 @@ Response body
 		user: {
 		  "name": "string",
 		  "email": "string",
-		  "password": "string"
 		},
 		message:"user created !"
 	}
@@ -75,13 +72,24 @@ Request body
 
 Response body
 
+If user provider invalid credentials
+```js
+	{
+		"isLogged":false,
+		"message":"email or password invalid",
+	}
+```
+
+If user provider valid credentials
 ```js
 	{
 		user: {
 		  "name": "ben",
 		  "email": "ben@gmail.com",
 		},
-		token:"$2b$10$0O.pVCtZO2QgxfPKh0WNsudCHglKsoGwhJ0GXciLYzHCa73x99Gpa"
+		"isLogged":true,
+		"message":"user logged",
+		"token":"$2b$10$0O.pVCtZO2QgxfPKh0WNsudCHglKsoGwhJ0GXciLYzHCa73x99Gpa"
 	}
 ```
 
@@ -269,7 +277,7 @@ Display list of posts on the home page of our vue app
 
 Endpoint
 ```js
-	/posts
+	/posts?query=
 ```
 
 Response body with status 200
@@ -301,7 +309,6 @@ Response body with status 200
 }
 
 ```
-
 
 
 
