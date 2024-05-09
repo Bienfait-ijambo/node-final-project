@@ -1,3 +1,5 @@
+const fs = require("fs");
+
 function generateId() {
     const now = new Date();
     const timestamp = now.getTime().toString(); // Get current timestamp as string

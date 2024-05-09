@@ -40,7 +40,7 @@ postRoutes.put("/posts/:id", async function (req, res) {
   const { data, postDBPath } = accessPostDBData();
 
   const posts = JSON.parse(data);
-
+  const postId=req.params?.id
 
   const filteredPosts = posts.data.filter(
     (post) => post.postId !== parseInt(postId)
@@ -49,9 +49,9 @@ postRoutes.put("/posts/:id", async function (req, res) {
     data: filteredPosts,
   };
 
-  const newData = [fileData];
+  const newData = [...fileData.data];
   newData.push({
-    postId: req.params?.id,
+    postId: parseInt(postId),
     title: req.body?.title,
     post_content: req.body?.post_content,
   });
@@ -59,7 +59,7 @@ postRoutes.put("/posts/:id", async function (req, res) {
 
   await writeDataToDb(postDBPath,newData)
 
-  res.json({ message: "post created !" }).status(200);
+  res.json({ message: "post updated !" }).status(200);
 });
 
 postRoutes.delete("/posts/:id", async function (req, res) {
@@ -71,11 +71,8 @@ postRoutes.delete("/posts/:id", async function (req, res) {
   const filteredPosts = posts.data.filter(
     (post) => post.postId !== parseInt(postId)
   );
-  const fileData = {
-    data: filteredPosts,
-  };
-
-  await writeDataToDb(postDBPath,fileData)
+ 
+  await writeDataToDb(postDBPath,filteredPosts)
 
   res.json({ message: "post deleted successfully !" }).status(200);
 });
