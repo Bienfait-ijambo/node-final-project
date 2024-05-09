@@ -18,22 +18,17 @@ function generateToken(userId) {
     const privateKey =
       "9e092ae63500405ea675102a92d7464d02c6e72f012469643b422db6e3c40cd";
     try {
-      resolve(
-        jwt.sign(
-          {
-            data: "foobar",
-          },
-          privateKey,
-          { expiresIn: "1h" }
-        )
-      );
+      resolve( jwt.sign( { data: "foobar", }, privateKey, { expiresIn: "1h" } ) );
     } catch (error) {
       reject(error);
     }
   });
 }
 
-userRoutes.post("/register", function (req, res) {
+const {generateId,writeDataToDb}=require('../util/util')
+
+
+userRoutes.post("/register", async function (req, res) {
   if (
     req.body?.name == "" ||
     req.body?.email == "" ||
@@ -44,7 +39,6 @@ userRoutes.post("/register", function (req, res) {
   const salt = generateSalt();
   const { data, userDBPath } = accessUserDBData();
   const users = JSON.parse(data);
-  const lastItem = users.data.length;
   const newData = [...users.data];
 
   
@@ -56,25 +50,22 @@ userRoutes.post("/register", function (req, res) {
   }
 
   newData.push({
-    id: lastItem + 1,
+    id: generateId(),
     name: req.body?.name,
     email: req.body?.email,
     password: hashedPassword,
     salt: salt,
   });
 
-  fs.writeFile(userDBPath, JSON.stringify({ data: newData }), "utf8", (err) => {
-    if (err) {
-      console.error("Error writing to file:", err);
-    } else {
-      console.log("Data has been written to file successfully.");
-    }
-  });
+
+  await writeDataToDb(userDBPath,newData);
+
 
   res.json({ message: "user successfully created !" }).status(200);
 });
 
 userRoutes.post("/login", async function (req, res) {
+
   if (req.body?.email == "" || req.body?.password == "") {
     res.json({ message: ["Provide  email and password"] }).status(422);
   }

@@ -7,38 +7,63 @@ function accessPostDBData() {
   const projectFolder = path.resolve(__dirname);
   const postDBPath = path.join(projectFolder, "/postDB.json");
   const data = fs.readFileSync(postDBPath, "utf8");
-  return {data,postDBPath};
+  return { data, postDBPath };
 }
 
 
 
-postRoutes.post("/posts", function (req, res) {
-  const {data,postDBPath} = accessPostDBData();
+
+const {generateId,writeDataToDb}=require('../util/util')
+
+postRoutes.post("/posts", async function (req, res) {
+  const { data, postDBPath } = accessPostDBData();
 
   const posts = JSON.parse(data);
 
-  const lastItem = posts.data.length;
-
   const newData = [...posts.data];
-  newData.push({
-    postId: lastItem + 2,
-    title: req.body?.title,
-    content: req.body?.content,
-  });
 
-  fs.writeFile(postDBPath, JSON.stringify({ data: newData }), "utf8", (err) => {
-    if (err) {
-      console.error("Error writing to file:", err);
-    } else {
-      console.log("Data has been written to file successfully.");
-    }
-  });
+
+    newData.push({
+      postId:  generateId(),
+      title: req.body?.title,
+      post_content: req.body?.post_content,
+    });
+  
+
+  await writeDataToDb(postDBPath,newData)
+
 
   res.json({ message: "post created !" }).status(200);
 });
 
-postRoutes.delete("/posts/:id", function (req, res) {
-  const {data,postDBPath}  = accessPostDBData();
+postRoutes.put("/posts/:id", async function (req, res) {
+  const { data, postDBPath } = accessPostDBData();
+
+  const posts = JSON.parse(data);
+
+
+  const filteredPosts = posts.data.filter(
+    (post) => post.postId !== parseInt(postId)
+  );
+  const fileData = {
+    data: filteredPosts,
+  };
+
+  const newData = [fileData];
+  newData.push({
+    postId: req.params?.id,
+    title: req.body?.title,
+    post_content: req.body?.post_content,
+  });
+
+
+  await writeDataToDb(postDBPath,newData)
+
+  res.json({ message: "post created !" }).status(200);
+});
+
+postRoutes.delete("/posts/:id", async function (req, res) {
+  const { data, postDBPath } = accessPostDBData();
 
   const postId = req.params?.id;
   const posts = JSON.parse(data);
@@ -50,26 +75,38 @@ postRoutes.delete("/posts/:id", function (req, res) {
     data: filteredPosts,
   };
 
-  fs.writeFile(postDBPath, JSON.stringify(fileData), "utf8", (err) => {
-    if (err) {
-      console.error("Error writing to file:", err);
-    } else {
-      console.log("Data has been written to file successfully.");
-    }
-  });
+  await writeDataToDb(postDBPath,fileData)
 
   res.json({ message: "post deleted successfully !" }).status(200);
 });
 
+
+
 postRoutes.get("/posts", function (req, res) {
-  const {data,postDBPath}  = accessPostDBData();
+  const { data, postDBPath } = accessPostDBData();
+  const query = req.query?.query;
   const posts = JSON.parse(data);
-  res.json(posts.data).status(200);
+
+  if (typeof query !== "undefined" && query !== "") {
+    const filteredposts = [];
+    for (const post of posts?.data) {
+      const title = post?.title.toLocaleLowerCase();
+      const queryTolowerCase = query.toLowerCase();
+
+      if (title.includes(queryTolowerCase)) {
+        filteredposts.push(post);
+      }
+    }
+
+    res.json(filteredposts).status(200);
+  } else {
+    res.json(posts.data).status(200);
+  }
 });
 
 postRoutes.get("/posts/:id", function (req, res) {
   const postId = req.params?.id;
-  const { getSinglePost } = require("./api/post/singlePost");
+  const { getSinglePost } = require("./singlePost");
   const post = getSinglePost(parseInt(postId));
   res.json(post).status(200);
 });
