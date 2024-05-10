@@ -1,9 +1,1 @@
-{
-  "data": [
-    {
-      "postId": 568221,
-      "title": "what is Docker",
-      "post_content": "content..."
-    }
-  ]
-}
+{"data":[{"id":568221,"title":"what is Ts ?","post_content":"When testing code that dispatches events, you may wish to instruct Laravel to not actually execute the event's listeners, since the listener's code can be tested directly and separately of the code that dispatches the corresponding event. Of course, to test the listener itself, you may instantiate a listener instance and invoke the handle method directly in your test.","image":"http://127.0.0.1:8000/storage/images/1715142611.jpg","slug":"what-is-mapped-types-in-ts-1wjjs21715145705"},{"id":883413,"title":"Better way to use Pinia","post_content":"content...","slug":"Better-way-to-use-Pinia","image":""},{"id":728142,"title":"Better way to use Pinia","post_content":"content...","slug":"Better-way-to-use-Pinia","image":""}]}

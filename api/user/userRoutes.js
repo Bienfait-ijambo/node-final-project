@@ -2,9 +2,8 @@ const fs = require("fs");
 const path = require("path");
 const express = require("express");
 const userRoutes = express.Router();
-var jwt = require("jsonwebtoken");
 const { hashPassword, generateSalt, checkPassword } = require("./passwordUtil");
-const {getSingleByEmail}=require('./singleUser')
+const { getSingleByEmail } = require("./singleUser");
 
 function accessUserDBData() {
   const projectFolder = path.resolve(__dirname);
@@ -13,20 +12,9 @@ function accessUserDBData() {
   return { data, userDBPath };
 }
 
-function generateToken(userId) {
-  return new Promise((resolve, reject) => {
-    const privateKey =
-      "9e092ae63500405ea675102a92d7464d02c6e72f012469643b422db6e3c40cd";
-    try {
-      resolve( jwt.sign( { data: "foobar", }, privateKey, { expiresIn: "1h" } ) );
-    } catch (error) {
-      reject(error);
-    }
-  });
-}
 
-const {generateId,writeDataToDb}=require('../util/util')
 
+const { generateId, writeDataToDb,generateToken } = require("../util/util");
 
 userRoutes.post("/register", async function (req, res) {
   if (
@@ -41,12 +29,11 @@ userRoutes.post("/register", async function (req, res) {
   const users = JSON.parse(data);
   const newData = [...users.data];
 
-  
   const hashedPassword = hashPassword(req.body?.password, salt);
 
   const user = getSingleByEmail(users.data, req.body?.email);
-  if(user.length > 0){
-    res.status(201).send({ message: "This email address exist !" })
+  if (user.length > 0) {
+    res.status(201).send({ message: "This email address exist !" });
   }
 
   newData.push({
@@ -57,15 +44,12 @@ userRoutes.post("/register", async function (req, res) {
     salt: salt,
   });
 
-
-  await writeDataToDb(userDBPath,newData);
-
+  await writeDataToDb(userDBPath, newData);
 
   res.json({ message: "user successfully created !" }).status(200);
 });
 
 userRoutes.post("/login", async function (req, res) {
-
   if (req.body?.email == "" || req.body?.password == "") {
     res.json({ message: ["Provide  email and password"] }).status(422);
   }
@@ -77,7 +61,9 @@ userRoutes.post("/login", async function (req, res) {
   const user = getSingleByEmail(users.data, req.body?.email);
 
   if (user.length === 0) {
-    res.json({ message: "password or email invalid",isLogged: false, }).status(422);
+    res
+      .json({ message: "password or email invalid", isLogged: false })
+      .status(422);
   }
 
   const userData = user[0]; // Assuming getSingleByEmail returns an array with one user object
@@ -103,7 +89,9 @@ userRoutes.post("/login", async function (req, res) {
       })
       .status(200);
   } else {
-    res.json({ message: "Invalid email or password",isLogged: false, }).status(422);
+    res
+      .json({ message: "Invalid email or password", isLogged: false })
+      .status(422);
   }
 });
 

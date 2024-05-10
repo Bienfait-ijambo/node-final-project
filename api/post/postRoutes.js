@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const express = require("express");
+const slugify = require('slugify')
 const postRoutes = express.Router();
 
 function accessPostDBData() {
@@ -13,9 +14,9 @@ function accessPostDBData() {
 
 
 
-const {generateId,writeDataToDb}=require('../util/util')
+const {generateId,writeDataToDb,VerifyExpressToken}=require('../util/util')
 
-postRoutes.post("/posts", async function (req, res) {
+postRoutes.post("/posts", VerifyExpressToken,async function (req, res) {
   const { data, postDBPath } = accessPostDBData();
 
   const posts = JSON.parse(data);
@@ -24,9 +25,11 @@ postRoutes.post("/posts", async function (req, res) {
 
 
     newData.push({
-      postId:  generateId(),
+      id:  generateId(),
       title: req.body?.title,
       post_content: req.body?.post_content,
+      slug:slugify(req.body?.title),
+      image:''
     });
   
 
@@ -36,14 +39,14 @@ postRoutes.post("/posts", async function (req, res) {
   res.json({ message: "post created !" }).status(200);
 });
 
-postRoutes.put("/posts/:id", async function (req, res) {
+postRoutes.put("/posts/:id",VerifyExpressToken, async function (req, res) {
   const { data, postDBPath } = accessPostDBData();
 
   const posts = JSON.parse(data);
   const postId=req.params?.id
 
   const filteredPosts = posts.data.filter(
-    (post) => post.postId !== parseInt(postId)
+    (post) => post.id !== parseInt(postId)
   );
   const fileData = {
     data: filteredPosts,
@@ -51,9 +54,10 @@ postRoutes.put("/posts/:id", async function (req, res) {
 
   const newData = [...fileData.data];
   newData.push({
-    postId: parseInt(postId),
+    id: parseInt(postId),
     title: req.body?.title,
     post_content: req.body?.post_content,
+    slug:'',
   });
 
 
@@ -62,14 +66,14 @@ postRoutes.put("/posts/:id", async function (req, res) {
   res.json({ message: "post updated !" }).status(200);
 });
 
-postRoutes.delete("/posts/:id", async function (req, res) {
+postRoutes.delete("/posts/:id",VerifyExpressToken, async function (req, res) {
   const { data, postDBPath } = accessPostDBData();
 
   const postId = req.params?.id;
   const posts = JSON.parse(data);
 
   const filteredPosts = posts.data.filter(
-    (post) => post.postId !== parseInt(postId)
+    (post) => post.id !== parseInt(postId)
   );
  
   await writeDataToDb(postDBPath,filteredPosts)
@@ -79,7 +83,7 @@ postRoutes.delete("/posts/:id", async function (req, res) {
 
 
 
-postRoutes.get("/posts", function (req, res) {
+postRoutes.get("/posts",function (req, res) {
   const { data, postDBPath } = accessPostDBData();
   const query = req.query?.query;
   const posts = JSON.parse(data);
