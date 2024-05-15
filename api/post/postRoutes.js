@@ -16,6 +16,29 @@ function accessPostDBData() {
 
 const {generateId,writeDataToDb,VerifyExpressToken}=require('../util/util')
 
+
+
+postRoutes.post("/logout", VerifyExpressToken,async function (req, res) {
+  
+  res.json({ message:"user logged out" }).status(200);
+});
+
+
+postRoutes.get("/check/user/loggedin", VerifyExpressToken,async function (req, res) {
+  
+  res.json({ success:true }).status(200);
+});
+
+
+postRoutes.get("/count/posts", VerifyExpressToken,async function (req, res) {
+  const { data, postDBPath } = accessPostDBData();
+
+  const posts = JSON.parse(data);
+  const count=posts.data.length
+  res.json({ data:count }).status(200);
+});
+
+
 postRoutes.post("/posts", VerifyExpressToken,async function (req, res) {
   const { data, postDBPath } = accessPostDBData();
 
@@ -57,7 +80,7 @@ postRoutes.put("/posts/:id",VerifyExpressToken, async function (req, res) {
     id: parseInt(postId),
     title: req.body?.title,
     post_content: req.body?.post_content,
-    slug:'',
+    slug:slugify(req.body?.title),
   });
 
 
@@ -83,7 +106,17 @@ postRoutes.delete("/posts/:id",VerifyExpressToken, async function (req, res) {
 
 
 
-postRoutes.get("/posts",function (req, res) {
+
+postRoutes.get("/client/posts",function (req, res) {
+  const { data, postDBPath } = accessPostDBData();
+  const posts = JSON.parse(data);
+  const postArray = posts.data
+
+    res.json(postArray).status(200);
+  
+});
+
+postRoutes.get("/posts",VerifyExpressToken,function (req, res) {
   const { data, postDBPath } = accessPostDBData();
   const query = req.query?.query;
   const posts = JSON.parse(data);
@@ -99,16 +132,18 @@ postRoutes.get("/posts",function (req, res) {
       }
     }
 
-    res.json(filteredposts).status(200);
+    res.json({data:filteredposts}).status(200);
   } else {
-    res.json(posts.data).status(200);
+    res.json({data:posts.data}).status(200);
   }
 });
 
-postRoutes.get("/posts/:id", function (req, res) {
-  const postId = req.params?.id;
-  const { getSinglePost } = require("./singlePost");
-  const post = getSinglePost(parseInt(postId));
+
+
+postRoutes.get("/posts/:slug", function (req, res) {
+  const slug = req.params?.slug;
+  const { getSinglePostBySlug } = require("./singlePost");
+  const post = getSinglePostBySlug(slug);
   res.json(post).status(200);
 });
 
