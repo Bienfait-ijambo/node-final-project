@@ -8,7 +8,7 @@ function getSinglePost(postId) {
     const data = fs.readFileSync(postDBPath, "utf8");
     const posts = JSON.parse(data);
 
-    const selectedPost = posts.data.filter((post) => post.id === postId);
+    const selectedPost = posts.data.filter((post) => post.id == postId);
     return selectedPost;
   } catch (error) {
     console.log(error.message);

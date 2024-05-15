@@ -14,7 +14,7 @@ function accessPostDBData() {
 
 
 
-const {generateId,writeDataToDb,VerifyExpressToken}=require('../util/util')
+const {generateId,writeDataToDb,VerifyExpressToken,upload}=require('../util/util')
 
 
 
@@ -81,6 +81,8 @@ postRoutes.put("/posts/:id",VerifyExpressToken, async function (req, res) {
     title: req.body?.title,
     post_content: req.body?.post_content,
     slug:slugify(req.body?.title),
+    image:filteredPosts[0]?.image,
+
   });
 
 
@@ -88,6 +90,47 @@ postRoutes.put("/posts/:id",VerifyExpressToken, async function (req, res) {
 
   res.json({ message: "post updated !" }).status(200);
 });
+
+
+
+
+
+
+
+postRoutes.post("/posts/upload-image",VerifyExpressToken, upload.single('image'), async function (req, res) {
+  const { data, postDBPath } = accessPostDBData();
+
+  const posts = JSON.parse(data);
+  
+  const postId=req.body?.postId
+
+  const toUpdate = posts.data.filter(
+    (post) => post.id == parseInt(postId)
+  );
+  const filteredPosts = posts.data.filter(
+    (post) => post.id !== parseInt(postId)
+  );
+  const fileData = {
+    data: filteredPosts,
+  };
+
+  const newData = [...fileData.data];
+  console.log(toUpdate)
+  newData.push({
+    id: parseInt(postId),
+    title: toUpdate[0]?.title,
+    post_content: toUpdate[0]?.post_content,
+    slug:slugify(toUpdate[0]?.title),
+    image:`http://localhost:3000/${req.file?.filename}`,
+  });
+
+
+  await writeDataToDb(postDBPath,newData)
+
+  res.json({ message: "Image updated !" }).status(200);
+});
+
+
 
 postRoutes.delete("/posts/:id",VerifyExpressToken, async function (req, res) {
   const { data, postDBPath } = accessPostDBData();

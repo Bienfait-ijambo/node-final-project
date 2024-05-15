@@ -1,5 +1,8 @@
 const fs = require("fs");
 var jwt = require("jsonwebtoken");
+const multer = require('multer');
+const path = require('path');
+
 const privateKey ="9e092ae63500405ea675102a92d7464d02c6e72f012469643b422db6e3c40cd";
 
 
@@ -66,4 +69,22 @@ function generateToken(userId) {
   });
 }
 
-module.exports = { generateId, writeDataToDb,VerifyExpressToken,generateToken };
+
+
+
+
+const storage = multer.diskStorage({
+  destination: function(req, file, cb) {
+    cb(null, 'uploads/'); // Specify the destination directory where files will be uploaded
+  },
+  filename: function(req, file, cb) {
+    cb(null, Date.now() + path.extname(file.originalname)); // Rename the file to avoid naming conflicts
+  }
+});
+
+// Initialize Multer with storage configuration
+const upload = multer({ storage: storage });
+
+
+
+module.exports = { generateId,upload, writeDataToDb,VerifyExpressToken,generateToken };
