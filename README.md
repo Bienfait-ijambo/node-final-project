@@ -60,7 +60,7 @@ Response body
 Endpoint
 
 ```js
-	/users
+	/login
 ```
 
 Request body
