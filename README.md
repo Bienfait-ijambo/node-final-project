@@ -24,7 +24,7 @@ POST
 Endpoint
 
 ```js
-	/users
+	/register
 ```
 
 Request body

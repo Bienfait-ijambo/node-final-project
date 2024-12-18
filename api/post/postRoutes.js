@@ -159,7 +159,8 @@ postRoutes.get("/client/posts",function (req, res) {
   
 });
 
-postRoutes.get("/posts",VerifyExpressToken,function (req, res) {
+// VerifyExpressToken
+postRoutes.get("/posts",function (req, res) {
   const { data, postDBPath } = accessPostDBData();
   const query = req.query?.query;
   const posts = JSON.parse(data);
@@ -184,6 +185,7 @@ postRoutes.get("/posts",VerifyExpressToken,function (req, res) {
 
 
 postRoutes.get("/posts/:slug", function (req, res) {
+  console.log('f...')
   const slug = req.params?.slug;
   const { getSinglePostBySlug } = require("./singlePost");
   const post = getSinglePostBySlug(slug);
