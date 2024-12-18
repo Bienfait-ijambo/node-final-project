@@ -28,6 +28,7 @@ app.use((err, req, res, next) => {
   console.error(err);
 });
 
+
 app.use('/api',postRoutes)
 app.use('/api',userRoutes)
 
